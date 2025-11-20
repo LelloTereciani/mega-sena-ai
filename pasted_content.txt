@@ -1,0 +1,500 @@
+PROJECT CONTEXT:
+Create a mobile-first web application called "LotoMind AI" - an educational lottery analysis tool that uses Data Science and AI strategies to provide statistical insights. Target audience: 18+ lottery players interested in data-driven analysis. Tech stack: React, Tailwind CSS, Shadcn/UI, Lucide React (icons), Recharts, and Framer Motion. Supports real data import via .xlsx files and remote API fetching.
+
+Core value proposition: Educational tool showing statistical analysis and patterns, NOT guaranteed predictions. Must emphasize responsible gaming and legal compliance throughout.
+
+═══════════════════════════════════════════════════════
+
+CRITICAL ADDITION: DATA SOURCES & IMPORT
+
+Data Source Options:
+
+1. Local File Import (.xlsx):
+   - Add "Importar Resultados" button in Analytics screen header
+   - Use SheetJS (xlsx) library to parse Excel files
+   - Expected Excel structure:
+     * Column A: Data do Sorteio (DD/MM/YYYY)
+     * Column B: Concurso (number)
+     * Columns C-H: Números Sorteados (6 columns, numbers 01-60)
+     * Column I: Prêmio (optional, currency format)
+   - Validation: Check for 6 numbers per row, range 1-60, no duplicates
+   - On success: Store in IndexedDB for persistence, show toast "X sorteios importados"
+   - On error: Show detailed error message with row number
+
+2. Remote Data Fetching:
+   - Add "Atualizar da Internet" button (RefreshCw icon)
+   - Fetch from mock API endpoint: https://api.loterias.exemplo.com.br/megasena/resultados
+   - Expected JSON structure:
+     ```json
+     {
+       "lottery": "mega-sena",
+       "draws": [
+         {
+           "contest": 2650,
+           "date": "2024-01-15",
+           "numbers": [5, 12, 23, 34, 45, 58],
+           "prize": 50000000
+         }
+       ]
+     }
+     ```
+   - Loading state: "Buscando resultados atualizados..." with spinner
+   - Cache strategy: Store last fetch timestamp, auto-refresh if > 7 days
+   - Fallback: If fetch fails, use local data or bundled mock data
+
+3. Data Management:
+   - Use IndexedDB (via idb library) to store large datasets
+   - Database structure:
+     * Store: "draws" with index on date
+     * Store: "metadata" for last update timestamp
+   - Export feature: Allow user to download current data as .xlsx
+   - Clear data: Button to reset and start fresh
+
+Implementation Files:
+- /src/lib/data-import/excelParser.ts (SheetJS integration)
+- /src/lib/data-import/remoteFetcher.ts (API calls)
+- /src/lib/data-import/indexedDBManager.ts (local storage)
+- /src/lib/data-import/dataValidator.ts (validation logic)
+
+═══════════════════════════════════════════════════════
+
+CRITICAL ADDITION: FLEXIBLE BET GENERATION (6-20 NUMBERS)
+
+User Configuration in AI Predictor Screen:
+
+Add new section BEFORE Strategy Selector:
+
+- "Configuração do Jogo" Card (mb-6):
+  
+  * Number Selection Control:
+    - Label: "Quantos números deseja gerar?" (text-sm font-semibold mb-2)
+    - Shadcn Slider component:
+      * min={6} max={20} step={1} defaultValue={6}
+      * Visual display: Large number above slider showing current value (text-4xl font-mono)
+      * Helper text below: "Gerando {value} números" (text-sm text-slate-400)
+    - Info tooltip (HelpCircle icon):
+      * "Mais números = maior cobertura, mas mais cartões necessários"
+      * Show cost calculation preview: "~{estimatedCards} cartões × R$ 5,00 = R$ {total}"
+  
+  * Game Quantity Selector:
+    - Label: "Quantos jogos diferentes gerar?" (text-sm font-semibold mb-2)
+    - Shadcn Select or Number Input:
+      * Options: 1, 3, 5, 10, 20, 50 jogos
+      * Helper text: "Cada jogo terá {selectedNumbers} números otimizados"
+
+Mathematical Explanation Card (collapsible):
+- Title: "Como funciona a otimização?" (with ChevronDown icon)
+- Content (when expanded):
+  * "Ao selecionar mais de 6 números, o sistema gera a menor combinação possível de cartões que cubram todos os números escolhidos."
+  * Example visual:
+    - Input: 10 números → Output: 3-4 cartões de 6 números
+    - Show combinations tree diagram (optional)
+  * "Método: Cobertura por Sistemas Reduzidos (garantindo intersecções mínimas)"
+
+═══════════════════════════════════════════════════════
+
+CRITICAL ADDITION: CARTESIAN OPTIMIZATION ALGORITHM
+
+Card Optimization Logic:
+
+When user selects N numbers (6-20) to generate, the system must:
+
+1. Combinatorial Calculation:
+   - Formula: C(n,6) = n! / (6! × (n-6)!)
+   - Examples:
+     * 6 números → 1 cartão (C(6,6) = 1)
+     * 7 números → 7 cartões (C(7,6) = 7)
+     * 8 números → 28 cartões (C(8,6) = 28)
+     * 9 números → 84 cartões
+     * 10 números → 210 cartões
+   
+2. Optimization Strategy (Sistema Reduzido):
+   - Goal: Minimize number of cards while maximizing coverage
+   - Use "Garantia Mínima" approach:
+     * Instead of all combinations, select strategic subsets
+     * Ensure each number appears in multiple cards (redundancy)
+     * Balance: Each card shares numbers with others to reduce cost
+   
+   - Optimization Levels (user selectable):
+     a) "Completo" (Fechamento Total): All possible combinations
+        - Pro: 100% coverage of all possibilities
+        - Con: Expensive (many cards)
+        - Use: When budget allows maximum coverage
+     
+     b) "Otimizado" (Sistema Reduzido - DEFAULT): Smart reduction
+        - Pro: 60-80% coverage with 30-50% fewer cards
+        - Con: Some combinations not covered
+        - Algorithm: Greedy set cover approach
+        - Use: Balanced cost/coverage
+     
+     c) "Econômico" (Mínimo de Cartões): Minimal cards
+        - Pro: Lowest cost
+        - Con: ~40-50% coverage
+        - Algorithm: Random sampling with constraint satisfaction
+        - Use: Budget-constrained users
+
+3. Implementation Algorithm (Optimized Strategy):
+   
+   ```typescript
+   // /src/lib/optimization/cardOptimizer.ts
+   
+   interface OptimizationResult {
+     cards: number[][]; // Array of 6-number arrays
+     coverage: number; // Percentage (0-100)
+     totalCost: number; // cards.length × 5.00
+     technique: string; // Name of optimization used
+   }
+   
+   function optimizeCards(
+     selectedNumbers: number[], // User's N numbers (6-20)
+     strategy: 'complete' | 'optimized' | 'economical'
+   ): OptimizationResult {
+     
+     if (selectedNumbers.length === 6) {
+       return {
+         cards: [selectedNumbers],
+         coverage: 100,
+         totalCost: 5.00,
+         technique: "Jogo Simples"
+       };
+     }
+     
+     switch(strategy) {
+       case 'complete':
+         return generateAllCombinations(selectedNumbers);
+       
+       case 'optimized':
+         return greedySetCover(selectedNumbers);
+       
+       case 'economical':
+         return minimalCardSet(selectedNumbers);
+     }
+   }
+   
+   // Greedy Set Cover Algorithm
+   function greedySetCover(numbers: number[]): OptimizationResult {
+     const n = numbers.length;
+     const targetCoverage = 0.7; // 70% coverage
+     const maxCombinations = combinations(n, 6);
+     const targetCards = Math.ceil(maxCombinations * targetCoverage);
+     
+     // Generate cards ensuring:
+     // 1. Each number appears ~equally across cards
+     // 2. Maximum overlap between cards (shared numbers)
+     // 3. Diverse coverage (avoid repetitive patterns)
+     
+     // Implementation: Use balanced sampling with constraints
+     // ... (detailed algorithm implementation)
+   }
+
+Visual Display in Results:
+
+After "Run AI Simulation", show:
+
+Summary Card (bg-blue-900/20 border-blue-500/50 p-4 rounded-lg mb-4):
+
+Title: "Otimização Aplicada" (text-lg font-bold)
+Metrics:"Números Selecionados: {N}"
+"Cartões Gerados: {X}"
+"Cobertura: {Y}%" (with progress bar)
+"Custo Total: R$ {X × 5,00}"
+"Estratégia: {strategy name}"
+
+
+Info icon tooltip: Explanation of chosen optimization
+
+
+Cards List (expandable accordion):
+
+Each card shows 6 NumberBalls
+Subtitle: "Cartão {index} de {total}"
+Highlight shared numbers between cards (different color/border)
+Option to remove individual cards (recalculate cost)
+
+
+Optimization Selector in UI:
+
+Add after Number Selection Control:
+
+Label: "Nível de Otimização" (text-sm font-semibold mb-2)
+Radio Group (Shadcn RadioGroup):Option 1: "💎 Completo" Description: "Todas as combinações possíveis"
+Cost preview: "{X} cartões = R$ {cost}"
+
+
+Option 2: "⚡ Otimizado" (DEFAULT, with badge "Recomendado")Description: "Cobertura inteligente com menos cartões"
+Cost preview: "~{Y} cartões = R$ {cost} (economia de {Z}%)"
+
+
+Option 3: "💰 Econômico"Description: "Mínimo de cartões possível"
+Cost preview: "{W} cartões = R$ {cost}"
+
+═══════════════════════════════════════════════════════
+
+CRITICAL ADDITION: TRANSPARENT AI TECHNIQUES
+
+AI Strategy Redesign (REPLACE previous section):
+
+Each strategy must clearly explain its methodology and show transparency:
+
+Estatística Clássica (Classical Statistics):
+
+Badge: "📊 ESTATÍSTICA" (bg-blue-500/20 text-blue-400)
+
+
+Description:
+
+"Análise baseada em frequência, distribuição e probabilidade"
+"Usa apenas dados históricos reais sem modelagem preditiva"
+
+
+Techniques Used (show in expandable card):
+a) Frequência de Ocorrência:
+
+Calculate: frequency_map = count(number) / total_draws
+Weight: Hot numbers (top 20% frequency) get higher selection probability
+
+b) Análise de Intervalo (Gap Analysis):
+
+Calculate: draws_since_last_appearance for each number
+Weight: Overdue numbers (gap > 2 standard deviations) included
+
+c) Distribuição Par/Ímpar:
+
+Historical ratio: even_avg / odd_avg
+Constraint: Generated bet maintains ±1 of historical ratio
+
+d) Distribuição Alta/Baixa:
+
+Low (1-30) vs High (31-60) ratio from history
+Constraint: Match historical distribution
+
+e) Soma dos Números:
+
+Calculate: mean(sum(all_historical_draws))
+Constraint: Generated bet sum within 1 std dev of mean
+
+
+Output Display:
+
+Show which rule influenced each number selection
+Example: "Número 23: Alta frequência (89 vezes) + Intervalo normal (3 sorteios)"
+
+
+Regressão Linear/Logística (Regression Models):
+
+Badge: "📈 REGRESSÃO" (bg-purple-500/20 text-purple-400)
+
+
+Description:
+
+"Modelo estatístico que identifica tendências temporais"
+"Analisa se números mostram padrões crescentes/decrescentes ao longo do tempo"
+
+
+Techniques Used:
+a) Regressão Linear por Número:
+
+For each number (1-60):X = draw_index (chronological order)
+Y = binary (1 if number appeared, 0 if not)
+Calculate: slope = Δfrequency / Δtime
+
+
+Interpretation:Positive slope → "Número em tendência de alta"
+Negative slope → "Número em tendência de baixa"
+Near-zero slope → "Número estável"
+
+b) Logistic Regression (Probabilidade de Ocorrência):
+
+Features: [draws_since_last, total_frequency, position_in_range, even/odd]
+Target: Will appear in next draw (binary: 0/1)
+Train on 80% historical data, validate on 20%
+Output: Probability score (0-1) for each number
+
+c) Polynomial Regression (Ciclos):
+
+Detect cyclical patterns: Numbers that appear in waves
+Fit polynomial (degree 2-3) to frequency over time
+Predict: Numbers at "peak" of their cycle
+
+
+Output Display:
+
+Show regression equation: "y = 0.023x + 0.15"
+Chart: Line plot of predicted vs actual frequency
+Confidence intervals: "Número 42: 78% de confiança (IC 95%: [0.65, 0.91])"
+
+
+Machine Learning - Redes Neurais (Neural Networks):
+
+Badge: "🧠 DEEP LEARNING" (bg-green-500/20 text-green-400)
+
+
+Description:
+
+"Rede neural treinada em padrões complexos e não-lineares"
+"Modelo experimental que aprende representações latentes dos dados"
+
+
+Architecture (show diagram):
+
+Input Layer (60 neurons): One-hot encoding of last 5 draws (300 features)
+Hidden Layer 1 (128 neurons): ReLU activation
+Hidden Layer 2 (64 neurons): ReLU activation
+Output Layer (60 neurons): Sigmoid activation (probability per number)
+
+
+Techniques Used:
+a) Sequence Learning (LSTM/GRU):
+
+Input: Last N draws as sequence
+Learn: Temporal dependencies between draws
+Output: Probability distribution for next draw
+
+b) Autoencoder (Pattern Recognition):
+
+Train: Compress draw history to 10D latent space
+Learn: Common patterns/clusters in historical data
+Generate: Sample from latent space, decode to 6-number set
+
+c) Ensemble Model:
+
+Combine: 3 neural nets with different architectures
+Voting: Numbers appearing in 2+ models get priority
+Confidence: Agreement percentage across models
+
+
+Training Details (show in modal):
+
+Dataset: {total_draws} sorteios
+Train/Test Split: 80/20
+Epochs: 100 (with early stopping)
+Loss Function: Binary Cross-Entropy
+Optimizer: Adam (lr=0.001)
+Validation Accuracy: XX% (realistic: ~15-20% for lottery)
+Warning: "⚠️ Modelo experimental. Loteria é aleatória, IA não garante resultados."
+
+
+Output Display:
+
+Show activation heatmap: Which neurons "fired" for selected numbers
+Feature importance: Which input features influenced decision
+Attention weights: Which past draws had most influence
+
+
+Machine Learning - Clustering (Unsupervised Learning):
+
+Badge: "🔍 CLUSTERING" (bg-yellow-500/20 text-yellow-400)
+
+
+Description:
+
+"Identifica grupos de números que aparecem juntos com frequência"
+"Análise não-supervisionada de padrões de co-ocorrência"
+
+
+Techniques Used:
+a) K-Means Clustering:
+
+Features: Co-occurrence matrix (60×60) - how often pairs appear together
+K: 6-8 clusters
+Interpretation: Each cluster = "family" of related numbers
+Selection: Pick 1-2 numbers from each cluster for diversity
+
+b) DBSCAN (Density-Based):
+
+Find: Dense regions in number space
+Outliers: Numbers that rarely appear with others (avoid)
+Core points: Frequently co-occurring numbers (prioritize)
+
+c) Hierarchical Clustering:
+
+Dendrogram: Visual tree of number relationships
+Cut tree at optimal height to form groups
+Generate: Pick numbers from different branches for coverage
+
+
+Output Display:
+
+Show cluster visualization: Scatter plot with colored groups
+Cluster labels: "Cluster 1: Números baixos frequentes" 
+Justification: "2 números do Cluster A, 2 do Cluster B, 1 do C, 1 do D"
+
+
+Híbrido Multi-Técnica (Ensemble Approach):
+
+Badge: "⚡ HÍBRIDO" (bg-gradient-to-r from-purple-500 to-green-500)
+
+
+Description:
+
+"Combina estatística, regressão, ML e clustering em modelo único"
+"Sistema de votação ponderado entre diferentes técnicas"
+
+
+Workflow:
+
+Run all 4 techniques above in parallel
+Each technique ranks all 60 numbers with score (0-1)
+Weighted average: Statistics: 30%
+Regression: 25%
+Neural Network: 25%
+Clustering: 20%
+
+
+Select top N numbers based on combined score
+Apply card optimization
+
+
+Output Display:
+
+Table showing each number's score per technique:Nº  | Estat. | Regres. | Neural | Cluster | FINAL
+----+--------+---------+--------+---------+-------
+07  |  0.82  |  0.75   |  0.68  |  0.91   | 0.79 ✓
+23  |  0.76  |  0.83   |  0.72  |  0.65   | 0.74 ✓
+...
+
+
+Highlight: Numbers selected, with their final score
+Disagreement indicator: If techniques conflict, show warning icon
+
+═══════════════════════════════════════════════════════
+
+UI IMPLEMENTATION: TECHNIQUE TRANSPARENCY
+
+Add "Transparência da IA" Section (after results are generated):
+
+Collapsible Card: "🔬 Como esses números foram escolhidos?"
+
+Tab Navigation (Shadcn Tabs):
+
+Tab 1: "Resumo Executivo"
+Tab 2: "Técnicas Aplicadas"
+Tab 3: "Dados Utilizados"
+Tab 4: "Limitações"
+
+
+Tab 1 Content (Resumo):
+
+List of techniques used with checkmarks
+Key metrics: "Confiança geral: 78%", "Sorteios analisados: 100"
+Visual: Pie chart showing technique contribution weights
+
+
+Tab 2 Content (Técnicas):
+
+For each technique used:Name + Badge
+Step-by-step explanation with icons
+Mathematical formulas (in LaTeX-style display)
+Example: "Número 23 foi selecionado porque: frequência (89×) + tendência positiva (slope=+0.03) + cluster central"
+
+
+Tab 3 Content (Dados):
+
+Source: "Importado de arquivo Excel em {date}"
+Total draws: {X}
+Date range: "{first_date} até {last_date}"
+Data quality: "✓ Sem inconsistências detectadas"
+Button: "Ver dados brutos" (opens modal with data table)
+
+
+Tab 4 Content (Limitações):
