@@ -22,7 +22,7 @@
 - [Exportação de Dados](##exportação-de-dados)
 - [Roadmap](##roadmap)
 - [Contribuindo](##contribuindo)
-- [Licença](## icença)
+- [Licença](##Licença)
 - [Contato](##contato)
 
 ---
