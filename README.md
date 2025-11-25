@@ -10,8 +10,6 @@
 
 ## 📋 **Índice**
 
-## 📋 **Índice**
-
 - [Sobre o Projeto](#sobre-o-projeto)
 - [Funcionalidades](#funcionalidades)
 - [Tecnologias Utilizadas](#tecnologias-utilizadas)
