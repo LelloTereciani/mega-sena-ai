@@ -1,0 +1,215 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #f6f7f8;
+  min-height: 100vh;
+}
+
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.App-header {
+  background: white;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.App-header h1 {
+  font-size: 2.5rem;
+  color: #22B24C;
+  margin-bottom: 0.3rem;
+  font-weight: 700;
+}
+
+.App-header p {
+  font-size: 1rem;
+  color: #666;
+  font-weight: 400;
+}
+
+.App-main {
+  flex: 1;
+  padding: 3rem 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.upload-section {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.upload-button {
+  display: inline-block;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: white;
+  background: #22B24C;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(34, 178, 76, 0.25);
+}
+
+.upload-button:hover {
+  background: #1e9d42;
+  box-shadow: 0 6px 16px rgba(34, 178, 76, 0.35);
+  transform: translateY(-2px);
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+}
+
+.spinner {
+  border: 4px solid #e0e0e0;
+  border-top: 4px solid #22B24C;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error {
+  background: #ff4757;
+  color: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+  margin: 2rem auto;
+  max-width: 600px;
+}
+
+.megasena-container {
+  background: white;
+  border-radius: 12px;
+  padding: 2.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.megasena-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 2rem;
+}
+
+.megasena-logo {
+  font-size: 1.5rem;
+  color: #22B24C;
+  font-weight: 700;
+}
+
+.clover-icon {
+  color: #22B24C;
+  font-size: 1.8rem;
+}
+
+.contest-info-text {
+  color: #666;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.contest-info-text strong {
+  color: #333;
+  font-weight: 600;
+}
+
+.numbers-container {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2rem 0;
+  flex-wrap: wrap;
+}
+
+.number-ball-green {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: #22B24C;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  font-weight: 700;
+  box-shadow: 0 3px 8px rgba(34, 178, 76, 0.3);
+  transition: all 0.2s ease;
+}
+
+.number-ball-green:hover {
+  transform: scale(1.08);
+  box-shadow: 0 4px 12px rgba(34, 178, 76, 0.4);
+}
+
+.contest-details {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e0e0e0;
+  color: #666;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.contest-number-badge {
+  color: #22B24C;
+  font-weight: 700;
+}
+
+.App-footer {
+  background: white;
+  padding: 1.5rem;
+  text-align: center;
+  color: #999;
+  font-size: 0.9rem;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 768px) {
+  .App-header h1 {
+    font-size: 2rem;
+  }
+  
+  .App-main {
+    padding: 2rem 1rem;
+  }
+  
+  .megasena-container {
+    padding: 1.5rem;
+  }
+  
+  .numbers-container {
+    gap: 0.8rem;
+  }
+  
+  .number-ball-green {
+    width: 60px;
+    height: 60px;
+    font-size: 1.4rem;
+  }
+}

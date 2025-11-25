@@ -1,0 +1,5 @@
+export const MEGA_SENA_CONFIG = {
+  MIN_NUMBER: 1,
+  MAX_NUMBER: 60,
+  NUMBERS_PER_GAME: 6,
+};
