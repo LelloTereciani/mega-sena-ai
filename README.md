@@ -10,20 +10,20 @@
 
 ## 📋 **Índice**
 
-- [Sobre o Projeto](## sobre-o-projeto)
-- [Funcionalidades](## funcionalidades)
-- [Tecnologias Utilizadas](## tecnologias-utilizadas)
-- [Arquitetura](## arquitetura)
-- [Instalação](## instalação)
-- [Como Usar](## como-usar)
-- [Estrutura do Projeto](## estrutura-do-projeto)
-- [Técnicas Implementadas](## técnicas-implementadas)
-- [Desdobramentos](## desdobramentos)
-- [Exportação de Dados](## exportação-de-dados)
-- [Roadmap](## roadmap)
-- [Contribuindo](## contribuindo)
-- [Licença](## licença)
-- [Contato](## contato)
+- [Sobre o Projeto](##sobre-o-projeto)
+- [Funcionalidades](##funcionalidades)
+- [Tecnologias Utilizadas](##tecnologias-utilizadas)
+- [Arquitetura](##arquitetura)
+- [Instalação](##instalação)
+- [Como Usar](##como-usar)
+- [Estrutura do Projeto](##estrutura-do-projeto)
+- [Técnicas Implementadas](##técnicas-implementadas)
+- [Desdobramentos](##desdobramentos)
+- [Exportação de Dados](##exportação-de-dados)
+- [Roadmap](##roadmap)
+- [Contribuindo](##contribuindo)
+- [Licença](## icença)
+- [Contato](##contato)
 
 ---
 
