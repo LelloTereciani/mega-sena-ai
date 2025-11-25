@@ -12,28 +12,28 @@
 
 ## 📋 **Índice**
 
-- [Sobre o Projeto](#-sobre-o-projeto)
-- [Funcionalidades](#-funcionalidades)
-- [Tecnologias Utilizadas](#%EF%B8%8F-tecnologias-utilizadas)
-- [Arquitetura](#%EF%B8%8F-arquitetura)
-- [Instalação](#-instalacao)
-- [Como Usar](#-como-usar)
-- [Estrutura do Projeto](#-estrutura-do-projeto)
-- [Técnicas Implementadas](#-tecnicas-implementadas)
-- [Desdobramentos](#-desdobramentos)
-- [Exportação de Dados](#-exportacao-de-dados)
-- [Roadmap](#%EF%B8%8F-roadmap)
-- [Contribuindo](#-contribuindo)
-- [Licença](#-licenca)
-- [Contato](#-contato)
+- [Sobre o Projeto](#sobre-o-projeto)
+- [Funcionalidades](#funcionalidades)
+- [Tecnologias Utilizadas](#tecnologias-utilizadas)
+- [Arquitetura](#arquitetura)
+- [Instalação](#instalacao)
+- [Como Usar](#como-usar)
+- [Estrutura do Projeto](#estrutura-do-projeto)
+- [Técnicas Implementadas](#tecnicas-implementadas)
+- [Desdobramentos](#desdobramentos)
+- [Exportação de Dados](#exportacao-de-dados)
+- [Roadmap](#roadmap)
+- [Contribuindo](#contribuindo)
+- [Licença](#licenca)
+- [Contato](#contato)
 
 ---
 
-## 📖 **Sobre o Projeto**
+## **Sobre o Projeto**
 
 O **Mega-Sena AI** é uma aplicação web moderna e responsiva que utiliza algoritmos de ciência de dados e inteligência artificial para analisar dados históricos da Mega-Sena e gerar sugestões de apostas baseadas em múltiplas estratégias estatísticas.
 
-### **🎯 Objetivo**
+### **Objetivo**
 
 Fornecer uma ferramenta completa para análise estatística de sorteios da Mega-Sena, auxiliando apostadores com:
 
@@ -42,21 +42,21 @@ Fornecer uma ferramenta completa para análise estatística de sorteios da Mega-
 - Desdobramentos matemáticos para otimizar custos
 - Estratégias avançadas de seleção de números
 
-### **⚠️ Aviso Legal**
+### **Aviso Legal**
 
 Este projeto é apenas para fins **educacionais e de análise estatística**. Não há garantia de acertos. Jogue com responsabilidade.
 
 ---
 
-## 🚀 **Funcionalidades**
+## **Funcionalidades**
 
-### **📊 Dashboard**
+### **Dashboard**
 
 - Visão geral dos dados carregados
 - Estatísticas rápidas
 - Últimos sorteios
 
-### **📈 Análises Estatísticas**
+### **Análises Estatísticas**
 
 - **Seleção de Período**: 50, 100, 200, 500, 1000 ou todos os sorteios
 - **Números Mais/Menos Sorteados**: Top 15 com percentuais
@@ -66,7 +66,7 @@ Este projeto é apenas para fins **educacionais e de análise estatística**. N�
 - **Soma dos Números**: Média, mínima, máxima, mediana
 - **Distribuição por Dezenas**: 6 faixas (01-10, 11-20, etc.)
 
-### **🤖 Gerador IA (Predictor)**
+### **Gerador IA (Predictor)**
 
 - **6 Técnicas de IA**:
   1. Híbrida (Multi-Algoritmo)
@@ -80,7 +80,7 @@ Este projeto é apenas para fins **educacionais e de análise estatística**. N�
 - **Gerar de 6 a 20 números**
 - **Desdobramento integrado**
 
-### **🔲 Supressão de Quadrantes**
+### **Supressão de Quadrantes**
 
 - **4 Quadrantes**: 01-15, 16-30, 31-45, 46-60
 - **Análise Quente/Frio**: Identifica quadrantes com padrões
@@ -88,14 +88,14 @@ Este projeto é apenas para fins **educacionais e de análise estatística**. N�
 - **Supressão Visual**: Clique para ativar/desativar
 - **Geração Restrita**: Usa apenas números não suprimidos
 
-### **🧠 Técnicas Avançadas**
+### **Técnicas Avançadas**
 
 - **�� Análise de Ciclos**: Detecta periodicidade e prevê próximas aparições
 - **🕸️ Grafos (Co-ocorrência)**: Identifica números que aparecem juntos usando teoria de grafos
 - **⛓️ Cadeias de Markov**: Probabilidades de transição baseadas no último sorteio
 - **📈 Análise de Correlação**: Mede dependência estatística entre pares de números
 
-### **🎯 Desdobramentos**
+### **Desdobramentos**
 
 - **⚡ Mínimo**: Menor custo possível mantendo cobertura básica
 - **⚖️ Balanceado**: Distribui números uniformemente
@@ -110,7 +110,7 @@ Este projeto é apenas para fins **educacionais e de análise estatística**. N�
 
 ---
 
-## 🛠️ **Tecnologias Utilizadas**
+## **Tecnologias Utilizadas**
 
 ### **Frontend**
 
@@ -143,11 +143,11 @@ Este projeto é apenas para fins **educacionais e de análise estatística**. N�
 
 ---
 
-## 🏗️ **Arquitetura**
+## **Arquitetura**
 
 ┌─────────────────────────────────────────────┐ │ INTERFACE (React) │ ├─────────────────────────────────────────────┤ │ Dashboard │ Analytics │ Predictor │ │ Quadrants │ Advanced │ Settings │ └─────────────────────────────────────────────┘ ↓ ┌─────────────────────────────────────────────┐ │ SERVICES (Business Logic) │ ├─────────────────────────────────────────────┤ │ • dataService • aiService │ │ • analyticsService • closingService │ │ • quadrantService • cycleAnalysis │ │ • graphAnalysis • markovService │ │ • correlationService │ └─────────────────────────────────────────────┘ ↓ ┌─────────────────────────────────────────────┐ │ DATA LAYER (Storage) │ ├─────────────────────────────────────────────┤ │ • LocalStorage (contests data) │ │ • CSV/XLSX Import │ │ • CSV Export │ └─────────────────────────────────────────────┘
 
---- ## 📦 **Instalação** ### **Pré-requisitos** - Node.js 14+ e npm/yarn instalados - Navegador moderno (Chrome, Firefox, Edge, Safari) ### **Passo a Passo** ```bash # 1. Clone o repositório git clone <https://github.com/seu-usuario/mega-sena-ai.git> cd mega-sena-ai # 2. Instale as dependências npm install # ou yarn install # 3. Inicie o servidor de desenvolvimento npm start # ou yarn start # 4. Acesse no navegador <<<http://localhost:3000>>>
+--- ## **Instalação** ### **Pré-requisitos** - Node.js 14+ e npm/yarn instalados - Navegador moderno (Chrome, Firefox, Edge, Safari) ### **Passo a Passo** ```bash # 1. Clone o repositório git clone <https://github.com/seu-usuario/mega-sena-ai.git> cd mega-sena-ai # 2. Instale as dependências npm install # ou yarn install # 3. Inicie o servidor de desenvolvimento npm start # ou yarn start # 4. Acesse no navegador <<<http://localhost:3000>>>
 Build para Produção
 bash
 
